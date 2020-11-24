@@ -125,8 +125,9 @@ dtrain <- xgb.DMatrix(data = train_data, label= train_labels)
 dtest <- xgb.DMatrix(data = test_data, label= test_labels)
 ```
 
-
 # Analysis
+
+## Supervised Learning
 
 ```{r set a random seed & shuffle data frame}
 set.seed(1234)
@@ -134,9 +135,9 @@ diseaseInfo <- diseaseInfo[sample(1:nrow(diseaseInfo)), ]
 ```
 
 ```{r train a model using our training data}
-model <- xgboost(data = dtrain, # the data   
+model <- xgboost(data = dtrain,  
                  nround = 2, # max number of boosting iterations
-                 objective = "binary:logistic")  # the objective function
+                 objective = "binary:logistic")  # objective function
 ```
 
 ```{r make prediction}
@@ -147,14 +148,15 @@ pred <- predict(model, dtest)
 err <- mean(as.numeric(pred > 0.5) != test_labels)
 print(paste("test-error=", err))
 ```
-## Tuninn our Model
+
+## Tuning  our Model
 
 ```{r}
 # train an xgboost model
-model_tuned <- xgboost(data = dtrain, # the data           
-                 max.depth = 3, # the maximum depth of each decision tree
+model_tuned <- xgboost(data = dtrain,          
+                 max.depth = 3, # maximum depth of each decision tree
                  nround = 2, # max number of boosting iterations
-                 objective = "binary:logistic") # the objective function 
+                 objective = "binary:logistic") # objective function 
 
 # generate predictions for our held-out testing data
 pred <- predict(model_tuned, dtest)
@@ -174,11 +176,11 @@ negative_cases <- sum(train_labels == FALSE)
 postive_cases <- sum(train_labels == TRUE)
 
 # train a model using our training data
-model_tuned <- xgboost(data = dtrain, # the data           
-                 max.depth = 3, # the maximum depth of each decision tree
+model_tuned <- xgboost(data = dtrain,           
+                 max.depth = 3, # maximum depth of each decision tree
                  nround = 10, # number of boosting rounds
-                 early_stopping_rounds = 3, # if we dont see an improvement in this many rounds, stop
-                 objective = "binary:logistic", # the objective function
+                 early_stopping_rounds = 3, # if we don't see an improvement in this many rounds, stop
+                 objective = "binary:logistic", # objective function
                  scale_pos_weight = negative_cases/postive_cases) # control for imbalanced classes
 
 # generate predictions for our held-out testing data
@@ -193,11 +195,11 @@ print(paste("test-error=", err))
 
 ```{r }
 # train a model using our training data
-model_tuned <- xgboost(data = dtrain, # the data           
-                 max.depth = 3, # the maximum depth of each decision tree
+model_tuned <- xgboost(data = dtrain,            
+                 max.depth = 3, # maximum depth of each decision tree
                  nround = 10, # number of boosting rounds
-                 early_stopping_rounds = 3, # if we dont see an improvement in this many rounds, stop
-                 objective = "binary:logistic", # the objective function
+                 early_stopping_rounds = 3, # if we don't see an improvement in this many rounds, stop
+                 objective = "binary:logistic", # objective function
                  scale_pos_weight = negative_cases/postive_cases, # control for imbalanced classes
                  gamma = 1) # add a regularization term
 
@@ -222,9 +224,8 @@ Because we're using a logistic model here, it's telling us the log-odds rather t
 ```{r}
 # convert log odds to probability
 odds_to_probs <- function(odds){
-    return(exp(odds)/ (1 + exp(odds)))
+    return(exp(odds) / (1 + exp(odds)))
 }
-
 
 # probability of leaf above countryPortugul
 odds_to_probs(-0.599)
@@ -237,5 +238,14 @@ importance_matrix <- xgb.importance(names(diseaseInfo_matrix), model = model)
 # and plot it!
 xgb.plot.importance(importance_matrix)
 
+```
+
+## Unsupervised Learning
+
+```{r}
+# diseaseInfo_numeric.pca <- prcomp(diseaseInfo_numeric[, c(1:7,10,11)],
+#                                   center = TRUE,
+#                                   scale = TRUE)
+diseaseInfo_numeric
 ```
 
